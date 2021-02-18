@@ -53,8 +53,6 @@ export default {
 .tab-bar-item {
   /* 均匀布局 */
   flex: 1;
-  text-align: center;
-  /* 移动应用下导航栏高度一般设49px */
   height: 49px;
   font-size: 14px;
 }
