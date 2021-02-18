@@ -1,11 +1,18 @@
 <template>
   <div>
+    <nav-bar class="home-nav">
+      <div slot="center">商城首页</div>
+    </nav-bar>
     首页
   </div>
 </template>
 
 <script>
-export default {}
+import NavBar from 'components/common/navbar/NavBar.vue'
+export default {
+  components: {
+    NavBar
+  }}
 </script>
 
 <style scoped>
