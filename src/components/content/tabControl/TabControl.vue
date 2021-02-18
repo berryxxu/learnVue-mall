@@ -28,6 +28,8 @@ export default {
   methods:{
     itemClick(index){
       this.currentIndex = index;
+      //向父组件home传递切换事件
+      this.$emit('tabClicked', index);
     }
   }
 }
@@ -44,7 +46,7 @@ export default {
   /* TabControl的吸顶效果实现 */
   /* top设为44时，上方有漏出部分，原因未知 */
   position:sticky;
-  top: 43.85px;
+  top: 43.5px;
 }
 
 .tab-control-item{

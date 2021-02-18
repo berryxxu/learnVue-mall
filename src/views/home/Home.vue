@@ -6,7 +6,8 @@
     <home-swiper :banners="banners"></home-swiper>
     <recommend-view :recommends="recommends"></recommend-view>
     <feature-view></feature-view>
-    <tab-control :titles="['流行', '新款', '样式']"></tab-control>
+    <tab-control :titles="['流行', '新款', '样式']" @tabClicked="tabClicked"></tab-control>
+    <good-list :goods="showGoodsList"></good-list>
   </div>
 </template>
 
@@ -15,9 +16,9 @@ import HomeSwiper from './childComps/HomeSwiper'
 import RecommendView from './childComps/RecommendView'
 import FeatureView from "./childComps/FeatureView"
 
-
 import NavBar from 'components/common/navbar/NavBar'
 import TabControl from 'components/content/tabControl/TabControl'
+import GoodList from 'components/content/goods/GoodList'
 
 import {getHomeMultiData, getHomeGoods} from "network/home"
 
@@ -25,6 +26,7 @@ export default {
   components: {
     NavBar,
     TabControl,
+    GoodList,
 
     HomeSwiper,
     RecommendView,
@@ -40,8 +42,15 @@ export default {
           'pop' :{page:0, list:[]}, //流行
           'new' :{page:0, list:[]}, //新款
           'sell' :{page:0, list:[]} //精选
-        }
+        },
+        //当前选中的商品类型
+        currentType: 'pop',
       }
+  },
+  computed:{
+    showGoodsList(){
+      return this.goods[this.currentType].list;
+    }
   },
   created(){
     // 1.获取首页的多个数据(轮播图，推荐项)
@@ -53,6 +62,8 @@ export default {
     this.getHomeGoods('sell');
   },
   methods:{
+
+    /** 数据获取相关 */
     //获取轮播图，推荐项
     getHomeMultiData(){
       getHomeMultiData().then(res => {
@@ -71,6 +82,23 @@ export default {
         //页码加1
         this.goods[type].page = page;
       });
+    },
+
+    /**事件监听相关 */
+
+    //切换商品类型
+    tabClicked(index){
+      switch(index){
+        case 0:
+          this.currentType = 'pop'
+          break;
+        case 1:
+          this.currentType = 'new';
+          break;
+        case 2: 
+          this.currentType = 'sell';
+          break;
+      }
     }
   }
 }
