@@ -2,8 +2,20 @@
 
 import { request } from "./request"
 
+//获取首页展示数据：轮播图+推荐
 export function getHomeMultiData() {
   return request({
     url: "/home/multidata"
+  })
+}
+
+//获取首页的商品列表。传入类型和页码
+export function getHomeGoods(type, page) {
+  return request({
+    url: "/home/data",
+    params: {
+      type,
+      page
+    }
   })
 }
