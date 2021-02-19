@@ -3,6 +3,14 @@
     <nav-bar class="home-nav">
       <div slot="center">商城首页</div>
     </nav-bar>
+    <!-- 吸顶（用两个tabbar实现） -->
+    <tab-control
+      :titles="['流行', '新款', '样式']"
+      @tabClicked="tabClicked"
+      class="tab-control-out"
+      ref="tabControlOut"
+      v-show="isTabFixed"
+    ></tab-control>
     <scroll
       class="content"
       ref="scroller"
@@ -11,12 +19,16 @@
       @scrolled="onContentScroll"
       @pullingUpEnd="onPullUpEnd"
     >
-      <home-swiper :banners="banners"></home-swiper>
+      <home-swiper
+        :banners="banners"
+        @swiperLoaded="swiperLoaded"
+      ></home-swiper>
       <recommend-view :recommends="recommends"></recommend-view>
       <feature-view></feature-view>
       <tab-control
         :titles="['流行', '新款', '样式']"
         @tabClicked="tabClicked"
+        ref="tabControlIn"
       ></tab-control>
       <good-list :goods="showGoodsList"></good-list>
     </scroll>
@@ -63,7 +75,11 @@ export default {
       },
       //当前选中的商品类型
       currentType: 'pop',
-      showBackTop: false
+      showBackTop: false,
+      //tabbar固定
+      isTabFixed: false,
+      tabbarOffset: 0,
+      scrollY: 0
     }
   },
   computed: {
@@ -91,6 +107,54 @@ export default {
 
   methods: {
 
+
+    /**
+     * 事件监听相关
+     **/
+    //tabbar 切换商品类型
+    tabClicked(index) {
+      switch (index) {
+        case 0:
+          this.currentType = 'pop'
+          break;
+        case 1:
+          this.currentType = 'new';
+          break;
+        case 2:
+          this.currentType = 'sell';
+          break;
+      }
+      //统一两个tabbar的选项
+      this.$refs.tabControlIn.currentIndex = index;
+      this.$refs.tabControlOut.currentIndex = index;
+    },
+
+    //返回顶部
+    clickBackTop() {
+      //返回顶部
+      this.$refs.scroller.scrollTo(0, 0, 500);
+    },
+
+    //监听滚动--控制回到顶部部件的显示
+    onContentScroll(position) {
+      //判断backtop是否显示
+      this.showBackTop = (-position.y) > 1000;
+
+      //tabbar是否吸顶（用两个tabbar实现,当滚动距离大于tabbar的offsetTop时，展示外部的tabbar）
+      this.isTabFixed = (-position.y) > this.tabbarOffset;
+    },
+
+    //上拉加载更多
+    onPullUpEnd() {
+      this.getHomeGoods(this.currentType);
+    },
+
+    swiperLoaded() {
+      //用$el获取组件对应的DOM元素，记录内部tabbar的offsetTop
+      this.tabbarOffset = this.$refs.tabControlIn.$el.offsetTop;
+    },
+
+
     /** 数据获取相关 */
     //获取轮播图，推荐项
     getHomeMultiData() {
@@ -109,44 +173,11 @@ export default {
         this.goods[type].list.push(...res.data.list);
         //页码加1
         this.goods[type].page = page;
+        //开启下次可上拉
+        this.$refs.scroller.finishPullUp();
       });
     },
 
-    /**
-     * 事件监听相关
-     **/
-    //tabbar 切换商品类型
-    tabClicked(index) {
-      switch (index) {
-        case 0:
-          this.currentType = 'pop'
-          break;
-        case 1:
-          this.currentType = 'new';
-          break;
-        case 2:
-          this.currentType = 'sell';
-          break;
-      }
-    },
-
-    //返回顶部
-    clickBackTop() {
-      //返回顶部
-      this.$refs.scroller.scrollTo(0, 0, 500);
-    },
-
-    //监听滚动--控制回到顶部部件的显示
-    onContentScroll(position) {
-      this.showBackTop = (-position.y) > 1000;
-    },
-
-    //上拉加载更多
-    onPullUpEnd() {
-      this.getHomeGoods(this.currentType);
-      //结束上拉，开启下次可上拉
-      this.$refs.scroller.finishPullUp();
-    },
 
   }
 }
@@ -174,14 +205,12 @@ export default {
   color: white;
 }
 
-/* .tab-control { */
-/* TabControl的吸顶效果实现 */
-/* top设为44时，上方有漏出部分，原因未知 */
-/* 使用BetterScroll后失效，还是应该自己实现 */
-/* position: sticky; */
-/* top: 43px; */
-/* z-index: 9; */
-/* } */
+/* 用Scroll组件外部的tabBar来实现吸顶效果 */
+.tab-control-out {
+  position: relative;
+  top: 44px;
+  z-index: 10;
+}
 
 /* bscroll滚动区域设置2--固定位置，设置top和bottom */
 .content {
