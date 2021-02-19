@@ -104,10 +104,22 @@ export default {
       refreshScroll();
     })
   },
-
+  destroyed() {
+    //在页面销毁时，移除事件监听
+    this.$bus.$off('imgLoad', {})
+  },
+  activated() {
+    //keep-alive时页面跳转，若better-scroll位置有误，可在此重新设定scroll的位置
+    // this.$refs.scroller.scrollTo(0, this.saveY, 1)
+    this.$refs.scroller.refresh();
+  },
+  deactivated() {
+    //在keep-alive状态下，页面跳转时，移除事件监听
+    this.$bus.$off('imgLoad', {})
+    //keep-alive时页面跳转，若better-scroll位置有误，可在此记录scroll的位置
+    // this.saveY = this.$refs.scroller.getScrollY();
+  },
   methods: {
-
-
     /**
      * 事件监听相关
      **/

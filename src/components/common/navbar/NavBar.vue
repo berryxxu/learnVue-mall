@@ -23,6 +23,7 @@ export default {
   display: flex;
   /* 没有内容时无高度 */
   line-height: 44px;
+  height: 44px;
   /* 内容居中 */
   text-align: center;
   box-shadow: 0 1px 1px rgba(100, 100, 100, 0.1);
