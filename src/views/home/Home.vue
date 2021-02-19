@@ -3,17 +3,24 @@
     <nav-bar class="home-nav">
       <div slot="center">商城首页</div>
     </nav-bar>
-    <scroll class="content" ref="scroller" :probe-type="3">
+    <scroll
+      class="content"
+      ref="scroller"
+      :probe-type="3"
+      :pull-up-load="true"
+      @scrolled="onContentScroll"
+      @pullingUpEnd="onPullUpEnd"
+    >
       <home-swiper :banners="banners"></home-swiper>
       <recommend-view :recommends="recommends"></recommend-view>
       <feature-view></feature-view>
       <tab-control
         :titles="['流行', '新款', '样式']"
         @tabClicked="tabClicked"
-        class="tab-control"
       ></tab-control>
       <good-list :goods="showGoodsList"></good-list>
     </scroll>
+    <back-top @click.native="clickBackTop" v-show="showBackTop"></back-top>
   </div>
 </template>
 
@@ -26,7 +33,9 @@ import NavBar from 'components/common/navbar/NavBar'
 import Scroll from 'components/common/scroll/Scroll'
 import TabControl from 'components/content/tabControl/TabControl'
 import GoodList from 'components/content/goods/GoodList'
+import BackTop from 'components/content/backTop/BackTop'
 
+import { debounce } from "common/utils"
 import { getHomeMultiData, getHomeGoods } from "network/home"
 
 export default {
@@ -35,6 +44,7 @@ export default {
     TabControl,
     Scroll,
     GoodList,
+    BackTop,
 
     HomeSwiper,
     RecommendView,
@@ -53,6 +63,7 @@ export default {
       },
       //当前选中的商品类型
       currentType: 'pop',
+      showBackTop: false
     }
   },
   computed: {
@@ -70,9 +81,16 @@ export default {
     this.getHomeGoods('sell');
   },
   mounted() {
+    //监听图片的加载，更新scroll的高度,结合防抖
+    const refreshScroll = debounce(this.$refs.scroller.refresh, 50);
+    this.$bus.$on('imgLoad', () => {
+      //加括号的话会执行该语句
+      refreshScroll();
+    })
   },
 
   methods: {
+
     /** 数据获取相关 */
     //获取轮播图，推荐项
     getHomeMultiData() {
@@ -91,16 +109,13 @@ export default {
         this.goods[type].list.push(...res.data.list);
         //页码加1
         this.goods[type].page = page;
-        //更新better-scroll，重新计算滚动高度
-        this.$nextTick(() => {
-          this.$refs.scroller.refresh();
-        });
       });
     },
 
-    /**事件监听相关 */
-
-    //切换商品类型
+    /**
+     * 事件监听相关
+     **/
+    //tabbar 切换商品类型
     tabClicked(index) {
       switch (index) {
         case 0:
@@ -113,7 +128,26 @@ export default {
           this.currentType = 'sell';
           break;
       }
-    }
+    },
+
+    //返回顶部
+    clickBackTop() {
+      //返回顶部
+      this.$refs.scroller.scrollTo(0, 0, 500);
+    },
+
+    //监听滚动--控制回到顶部部件的显示
+    onContentScroll(position) {
+      this.showBackTop = (-position.y) > 1000;
+    },
+
+    //上拉加载更多
+    onPullUpEnd() {
+      this.getHomeGoods(this.currentType);
+      //结束上拉，开启下次可上拉
+      this.$refs.scroller.finishPullUp();
+    },
+
   }
 }
 </script>
@@ -140,18 +174,18 @@ export default {
   color: white;
 }
 
-.tab-control {
-  /* TabControl的吸顶效果实现 */
-  /* top设为44时，上方有漏出部分，原因未知 */
-  position: sticky;
-  top: 43px;
-  z-index: 9;
-}
+/* .tab-control { */
+/* TabControl的吸顶效果实现 */
+/* top设为44时，上方有漏出部分，原因未知 */
+/* 使用BetterScroll后失效，还是应该自己实现 */
+/* position: sticky; */
+/* top: 43px; */
+/* z-index: 9; */
+/* } */
 
 /* bscroll滚动区域设置2--固定位置，设置top和bottom */
 .content {
   overflow: hidden;
-  height: 100%;
   position: absolute;
   top: 44px;
   bottom: 49px;

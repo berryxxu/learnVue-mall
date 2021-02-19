@@ -56,7 +56,7 @@ export default {
 
       // 1.创建BScroll对象
       this.bscroll = new BScroll(this.$refs.wrapper, {
-        click: true,
+        click: true,//不设置true，则无法监听div等的点击事件
         mouseWheel: true,
         bounce: {
           top: false
@@ -66,24 +66,34 @@ export default {
       })
 
       // 2.监听滚动的位置
-      this.bscroll.on('scroll', position => {
-        console.log(position);
-      })
+      if (this.probeType == 2 || this.probeType == 3) {
+        this.bscroll.on('scroll', position => {
+          this.$emit('scrolled', position);
+        })
+      }
 
       // 3.监听上拉事件
-      // this.bscroll.on('pullingUp', () => {
-
-      // })
+      if (this.pullUpLoad) {
+        //触发时机：当底部下拉距离超过阈值
+        this.bscroll.on('pullingUp', () => {
+          this.$emit('pullingUpEnd');
+        })
+      }
     },
 
     refresh() {
       // 代理better-scroll的refresh方法
-      this.scroll && this.scroll.refresh()
+      this.bscroll && this.bscroll.refresh()
     },
 
     scrollTo() {
       // 代理better-scroll的scrollTo方法
-      this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
+      // 默认方法参数：scrollTo(x, y, time, easing, extraTransform)
+      this.bscroll && this.bscroll.scrollTo.apply(this.bscroll, arguments)
+    },
+
+    finishPullUp() {
+      this.bscroll && this.bscroll.finishPullUp();
     }
   },
   watch: {
