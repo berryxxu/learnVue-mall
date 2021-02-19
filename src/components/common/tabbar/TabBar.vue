@@ -10,7 +10,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .tab-bar {
   /* 子组件flex布局 */
   display: flex;
@@ -20,15 +20,17 @@ export default {
   right: 0;
   bottom: 0;
 
-  text-align:center;
+  text-align: center;
 
   /* 移动应用下导航栏高度一般设49px */
-  height:49px;
-  border-top:1px solid #eee;
+  height: 49px;
+  border-top: 1px solid #eee;
   /* 背景颜色 */
   background-color: #f6f6f6;
 
   /* 设置阴影 */
   box-shadow: 0 -1px 1px rgba(100, 100, 100, 0.2);
+
+  z-index: 10;
 }
 </style>

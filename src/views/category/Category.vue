@@ -3,8 +3,17 @@
 </template>
 
 <script>
-export default {}
+
+export default {
+  name: "Category",
+  data() {
+    return {
+    }
+  },
+  mounted() {
+  }
+}
 </script>
 
-<style>
+<style scoped>
 </style>

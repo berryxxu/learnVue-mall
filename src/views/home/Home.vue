@@ -1,13 +1,19 @@
 <template>
-  <div class="home">
+  <div id="home">
     <nav-bar class="home-nav">
       <div slot="center">商城首页</div>
     </nav-bar>
-    <home-swiper :banners="banners"></home-swiper>
-    <recommend-view :recommends="recommends"></recommend-view>
-    <feature-view></feature-view>
-    <tab-control :titles="['流行', '新款', '样式']" @tabClicked="tabClicked"></tab-control>
-    <good-list :goods="showGoodsList"></good-list>
+    <scroll class="content" ref="scroller" :probe-type="3">
+      <home-swiper :banners="banners"></home-swiper>
+      <recommend-view :recommends="recommends"></recommend-view>
+      <feature-view></feature-view>
+      <tab-control
+        :titles="['流行', '新款', '样式']"
+        @tabClicked="tabClicked"
+        class="tab-control"
+      ></tab-control>
+      <good-list :goods="showGoodsList"></good-list>
+    </scroll>
   </div>
 </template>
 
@@ -17,15 +23,17 @@ import RecommendView from './childComps/RecommendView'
 import FeatureView from "./childComps/FeatureView"
 
 import NavBar from 'components/common/navbar/NavBar'
+import Scroll from 'components/common/scroll/Scroll'
 import TabControl from 'components/content/tabControl/TabControl'
 import GoodList from 'components/content/goods/GoodList'
 
-import {getHomeMultiData, getHomeGoods} from "network/home"
+import { getHomeMultiData, getHomeGoods } from "network/home"
 
 export default {
   components: {
     NavBar,
     TabControl,
+    Scroll,
     GoodList,
 
     HomeSwiper,
@@ -35,24 +43,24 @@ export default {
   data() {
     return {
       //记录数据
-        banners : [], //轮播图数据
-        recommends: [],//推荐项数据
-        //商品列表, 默认请求第一页数据
-        goods:{
-          'pop' :{page:0, list:[]}, //流行
-          'new' :{page:0, list:[]}, //新款
-          'sell' :{page:0, list:[]} //精选
-        },
-        //当前选中的商品类型
-        currentType: 'pop',
-      }
+      banners: [], //轮播图数据
+      recommends: [],//推荐项数据
+      //商品列表, 默认请求第一页数据
+      goods: {
+        'pop': { page: 0, list: [] }, //流行
+        'new': { page: 0, list: [] }, //新款
+        'sell': { page: 0, list: [] } //精选
+      },
+      //当前选中的商品类型
+      currentType: 'pop',
+    }
   },
-  computed:{
-    showGoodsList(){
+  computed: {
+    showGoodsList() {
       return this.goods[this.currentType].list;
     }
   },
-  created(){
+  created() {
     // 1.获取首页的多个数据(轮播图，推荐项)
     this.getHomeMultiData()
 
@@ -61,11 +69,13 @@ export default {
     this.getHomeGoods('new');
     this.getHomeGoods('sell');
   },
-  methods:{
+  mounted() {
+  },
 
+  methods: {
     /** 数据获取相关 */
     //获取轮播图，推荐项
-    getHomeMultiData(){
+    getHomeMultiData() {
       getHomeMultiData().then(res => {
         //存储获得的数据
         this.banners = res.data.banner.list;
@@ -73,29 +83,33 @@ export default {
       })
     },
     ///获取商品数据
-    getHomeGoods(type){
+    getHomeGoods(type) {
       //请求对应type的当前页码的，下一页的数据
       const page = this.goods[type].page + 1;
-      getHomeGoods(type, page).then(res =>{
+      getHomeGoods(type, page).then(res => {
         //数组数据的拼接(解构赋值)
         this.goods[type].list.push(...res.data.list);
         //页码加1
         this.goods[type].page = page;
+        //更新better-scroll，重新计算滚动高度
+        this.$nextTick(() => {
+          this.$refs.scroller.refresh();
+        });
       });
     },
 
     /**事件监听相关 */
 
     //切换商品类型
-    tabClicked(index){
-      switch(index){
+    tabClicked(index) {
+      switch (index) {
         case 0:
           this.currentType = 'pop'
           break;
         case 1:
           this.currentType = 'new';
           break;
-        case 2: 
+        case 2:
           this.currentType = 'sell';
           break;
       }
@@ -105,20 +119,51 @@ export default {
 </script>
 
 <style scoped>
-.home{
+#home {
   /* 固定顶部导航栏的方法1 */
-  padding-top:44px;
+  /* padding-top: 44px; */
+
+  /* 1vh是当前屏幕可见高度的1%，1vm为屏幕可见宽度的1% */
+  height: 100vh;
+  position: relative;
 }
 
-.home-nav{
+.home-nav {
   /* 固定顶部导航栏的方法1 */
-  position:fixed;
-  top : 0;
-  left:0;
-  right:0;
-  z-index:9;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9;
+
   background-color: var(--color-tint);
-  color:white;
+  color: white;
 }
 
+.tab-control {
+  /* TabControl的吸顶效果实现 */
+  /* top设为44时，上方有漏出部分，原因未知 */
+  position: sticky;
+  top: 43px;
+  z-index: 9;
+}
+
+/* bscroll滚动区域设置2--固定位置，设置top和bottom */
+.content {
+  overflow: hidden;
+  height: 100%;
+  position: absolute;
+  top: 44px;
+  bottom: 49px;
+  left: 0;
+  right: 0;
+}
+
+/* bscroll滚动区域设置1--计算高度calc */
+/* .content { */
+/* 44+49=93 */
+/* height: calc(100% - 93px); */
+/* overflow: hidden; */
+/* margin-top: 44px; */
+/* } */
 </style>

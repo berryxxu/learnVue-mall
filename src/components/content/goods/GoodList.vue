@@ -3,7 +3,12 @@
 **/
 <template>
   <div class="goods-list">
-    <goods-list-item v-for="(item, index) in goods" :goodsItem="item" :key="index" class="item">
+    <goods-list-item
+      v-for="(item, index) in goods"
+      :goodsItem="item"
+      :key="index"
+      class="item"
+    >
     </goods-list-item>
   </div>
 </template>
@@ -24,18 +29,12 @@ export default {
 }
 </script>
 
-<style>
-
-.goods-list{
-  display:flex;
+<style scoped>
+.goods-list {
+  display: flex;
   flex-wrap: wrap;
-  padding: 5px;
   /* 设置每个项目两侧的间隔相等 */
   justify-content: space-around;
+  padding: 5px;
 }
-
-.goods-list .item {
-  width: 48%;
-}
-
 </style>
