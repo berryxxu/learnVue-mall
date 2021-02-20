@@ -92,6 +92,11 @@ export default {
       this.bscroll && this.bscroll.scrollTo.apply(this.bscroll, arguments)
     },
 
+    scrollToElement() {
+      // 代理better-scrollToElement
+      this.bscroll && this.bscroll.scrollToElement.apply(this.bscroll, arguments)
+    },
+
     finishPullUp() {
       this.bscroll && this.bscroll.finishPullUp();
     }

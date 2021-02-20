@@ -20,8 +20,12 @@
         <table>
           <tr v-for="(item, index) in shopInfo.score" :key="index">
             <td>{{ item.name }}</td>
-            <td class="score">{{ item.score }}</td>
-            <td>{{ item.isBetter ? '高' : '低' }}</td>
+            <td class="score" :class="{ 'scroe-better': item.isBetter }">
+              {{ item.score }}
+            </td>
+            <td class="rank" :class="{ 'rank-better': item.isBetter }">
+              {{ item.isBetter ? '高' : '低' }}
+            </td>
             <td></td>
           </tr>
           <tr></tr>
@@ -29,7 +33,7 @@
       </div>
     </div>
     <div class="shop-info-bottom">
-      <div class="shop-go" @click="shopDetail"></div>
+      <div class="shop-go" @click="shopDetail">进店逛逛</div>
     </div>
   </div>
 </template>
@@ -118,15 +122,47 @@ export default {
 }
 
 .shop-info-middle .shop-info-right table {
-  width: 120px;
+  width: 150px;
+  height: 80px;
   margin-left: 30px;
 }
 
 .shop-info-right table td {
-  padding: 5px 0;
+  margin: 5px 0;
 }
 
 .shop-info-right .score {
   color: #5ea732;
+}
+
+.shop-info-right .rank {
+  color: white;
+  background-color: #5ea732;
+  border-radius: 2px;
+  text-align: center;
+}
+
+.shop-info-right .scroe-better {
+  color: red;
+}
+
+.shop-info-right .rank-better {
+  background-color: red;
+}
+
+.shop-info-bottom {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.shop-info-bottom .shop-go {
+  width: 150px;
+  height: 30px;
+  display: inline-block;
+  font-size: 14px;
+  background-color: #f2f5f8;
+  text-align: center;
+  line-height: 30px;
+  border-radius: 10px;
 }
 </style>

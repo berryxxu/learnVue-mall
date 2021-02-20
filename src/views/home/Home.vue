@@ -32,7 +32,7 @@
       ></tab-control>
       <good-list :goods="showGoodsList"></good-list>
     </scroll>
-    <back-top @click.native="clickBackTop" v-show="showBackTop"></back-top>
+    <back-top @click.native="clickBackTop" v-show="isShowBackTop"></back-top>
   </div>
 </template>
 
@@ -45,23 +45,24 @@ import NavBar from 'components/common/navbar/NavBar'
 import Scroll from 'components/common/scroll/Scroll'
 import TabControl from 'components/content/tabControl/TabControl'
 import GoodList from 'components/content/goods/GoodList'
-import BackTop from 'components/content/backTop/BackTop'
 
-import { debounce } from "common/utils"
 import { getHomeMultiData, getHomeGoods } from "network/home"
 
+import { imgLoadListenerMixin, backTopMixin } from "common/mixin.js"
+
 export default {
+  name: "Home",
   components: {
     NavBar,
     TabControl,
     Scroll,
     GoodList,
-    BackTop,
 
     HomeSwiper,
     RecommendView,
     FeatureView
   },
+  mixins: [imgLoadListenerMixin, backTopMixin],
   data() {
     return {
       //记录数据
@@ -75,11 +76,10 @@ export default {
       },
       //当前选中的商品类型
       currentType: 'pop',
-      showBackTop: false,
       //tabbar固定
       isTabFixed: false,
       tabbarOffset: 0,
-      scrollY: 0
+      scrollY: 0,
     }
   },
   computed: {
@@ -97,25 +97,28 @@ export default {
     this.getHomeGoods('sell');
   },
   mounted() {
-    //监听图片的加载，更新scroll的高度,结合防抖
-    const refreshScroll = debounce(this.$refs.scroller.refresh, 50);
-    this.$bus.$on('imgLoad', () => {
-      //加括号的话会执行该语句
-      refreshScroll();
-    })
+    //创建事件监听(mixin)
   },
   destroyed() {
-    //在页面销毁时，移除事件监听
-    this.$bus.$off('imgLoad', {})
+    //在页面销毁时，移除事件监听(mixin)
   },
   activated() {
     //keep-alive时页面跳转，若better-scroll位置有误，可在此重新设定scroll的位置
     // this.$refs.scroller.scrollTo(0, this.saveY, 1)
-    this.$refs.scroller.refresh();
+
+    //（有keep-alive，第一次挂载时mounted,activated都会触发，因而这里先移除mounted的监听）
+    this.$bus.$off('goodImgLoad', this.goodImgLoadListener)
+
+    //在keep-alive状态下，页面返回时，重新设置事件监听(无keep-alive时，才设置在mounted中)
+    this.$bus.$on('goodImgLoad', this.goodImgLoadListener)
+
+    //刷新Scroll的（mixin--防抖）
+    this.refreshScroll();
   },
   deactivated() {
-    //在keep-alive状态下，页面跳转时，移除事件监听
-    this.$bus.$off('imgLoad', {})
+    //在keep-alive状态下，页面跳转时，移除事件监听--?移除未成功
+    this.$bus.$off('goodImgLoad', this.goodImgLoadListener)
+
     //keep-alive时页面跳转，若better-scroll位置有误，可在此记录scroll的位置
     // this.saveY = this.$refs.scroller.getScrollY();
   },
@@ -141,16 +144,10 @@ export default {
       this.$refs.tabControlOut.currentIndex = index;
     },
 
-    //返回顶部
-    clickBackTop() {
-      //返回顶部
-      this.$refs.scroller.scrollTo(0, 0, 500);
-    },
-
     //监听滚动--控制回到顶部部件的显示
     onContentScroll(position) {
-      //判断backtop是否显示
-      this.showBackTop = (-position.y) > 1000;
+      //判断backtop是否显示(mixin)
+      this.updateIsShowBackTop(position);
 
       //tabbar是否吸顶（用两个tabbar实现,当滚动距离大于tabbar的offsetTop时，展示外部的tabbar）
       this.isTabFixed = (-position.y) > this.tabbarOffset;
