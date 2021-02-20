@@ -29,6 +29,7 @@
       <good-list :goods="recommendList" ref="detailrecommend"></good-list>
     </scroll>
     <back-top @click.native="clickBackTop" v-show="isShowBackTop"></back-top>
+    <detail-bottom-bar @addCartClick="addCartClick"></detail-bottom-bar>
   </div>
 </template>
 
@@ -40,6 +41,7 @@ import DetailShopInfo from "./childComps/DetailShopInfo"
 import DetailGoodDetail from "./childComps/DetailGoodDetail"
 import DetailParamInfo from "./childComps/DetailParamInfo"
 import DetailCommentInfo from "./childComps/DetailCommentInfo"
+import DetailBottomBar from './childComps/DetailBottomBar'
 
 import GoodList from 'components/content/goods/GoodList'
 import Scroll from 'components/common/scroll/Scroll'
@@ -58,6 +60,7 @@ export default {
     DetailGoodDetail,
     DetailParamInfo,
     DetailCommentInfo,
+    DetailBottomBar,
     GoodList,
     Scroll
   },
@@ -181,6 +184,26 @@ export default {
           break;
         }
       }
+    },
+
+    //添加到购物车
+    addCartClick() {
+      console.log('click-addcart')
+      //购物车商品信息
+      const goodObj = {
+        id: this.id,
+        desc: this.goodDetail.desc,
+        price: this.baseInfo.newPrice,
+        title: this.baseInfo.title,
+        img: this.swiperImgList[0]
+      }
+      this.$store.dispatch("addGoodToCart", goodObj)
+        .then(result => {
+          //todo : show toast
+          console.log(result);
+        }).catch(err => {
+          console.log(err)
+        })
     }
   }
 }
@@ -202,6 +225,6 @@ export default {
 
 .detail-scroll {
   position: relative;
-  height: calc(100% - 44px);
+  height: calc(100% - 44px - 58px);
 }
 </style>
