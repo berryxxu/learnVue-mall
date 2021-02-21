@@ -12,7 +12,8 @@ export const imgLoadListenerMixin = {
     //此时img标签确实被挂载了，但图像还未渲染结束。
     //监听商品列表项图片的加载，更新scroll的高度,结合防抖
     this.refreshScroll = debounce(() => {
-      this.$refs.scroller.refresh();
+      //页面跳转后scroller销毁
+      this.$refs.scroller && this.$refs.scroller.refresh();
     }, 100);
 
     //保存监听函数
@@ -24,7 +25,6 @@ export const imgLoadListenerMixin = {
     //设置监听
     this.$bus.$on("goodImgLoad", this.goodImgLoadListener);
   },
-
   destroyed() {
     //在页面销毁时，移除事件监听
     this.$bus.$off("goodImgLoad", this.goodImgLoadListener);

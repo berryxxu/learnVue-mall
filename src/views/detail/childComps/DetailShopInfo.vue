@@ -33,7 +33,7 @@
       </div>
     </div>
     <div class="shop-info-bottom">
-      <div class="shop-go" @click="shopDetail">进店逛逛</div>
+      <div class="shop-go" @click="shopClick">进店逛逛</div>
     </div>
   </div>
 </template>
@@ -55,9 +55,9 @@ export default {
     }
   },
   methods: {
-    shopDetail() {
-      //todo
-    }
+    shopClick() {
+      this.$emit('shopClick')
+    },
   }
 }
 </script>

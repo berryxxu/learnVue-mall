@@ -13,7 +13,10 @@
     >
       <detail-swiper :list="swiperImgList" ref="detailswiper"></detail-swiper>
       <detail-base-info :baseInfo="baseInfo"></detail-base-info>
-      <detail-shop-info :shopInfo="shopInfo"></detail-shop-info>
+      <detail-shop-info
+        :shopInfo="shopInfo"
+        @shopClick="shopDetail"
+      ></detail-shop-info>
       <detail-good-detail
         :goodDetail="goodDetail"
         @imagesLoad="detailImagesLoad"
@@ -29,7 +32,13 @@
       <good-list :goods="recommendList" ref="detailrecommend"></good-list>
     </scroll>
     <back-top @click.native="clickBackTop" v-show="isShowBackTop"></back-top>
-    <detail-bottom-bar @addCartClick="addCartClick"></detail-bottom-bar>
+    <detail-bottom-bar
+      @serviceClick="serviceClick"
+      @shopClick="shopDetail"
+      @collectClick="collectClick"
+      @addCartClick="addCartClick"
+      @checkOutClick="goodCheckOut"
+    ></detail-bottom-bar>
   </div>
 </template>
 
@@ -67,7 +76,7 @@ export default {
   mixins: [imgLoadListenerMixin, backTopMixin],
   data() {
     return {
-      id: null,
+      iid: null,
       swiperImgList: [],
       baseInfo: {},
       shopInfo: {},
@@ -82,10 +91,14 @@ export default {
     }
   },
   created() {
-    this.id = this.$route.query.id;
+    this.iid = this.$route.query.iid;
     this._initData();
 
     this.recordNavPositions = debounce(() => {
+      //页面离开后防抖进入这里会报错,destroyed里移除事件，这里进行判断
+      if (!this.recordNavPositions) return;
+      // if (this.$route.path !== '/detail') return;
+
       this.navElementYList = [];
       for (let elementRef of this.navElementRefs) {
         this.navElementYList.push(this.$refs[elementRef].$el.offsetTop);
@@ -98,13 +111,15 @@ export default {
     //事件总线监听，防抖。推荐商品-图片加载完毕后，更新scroll（mixin）
   },
   destroyed() {
+    //移除记录事件
+    this.recordNavPositions = null;
     //移除事件监听（mixin)
   },
   methods: {
     //获取数据
     _initData() {
       //商品数据
-      getDetailData(this.id)
+      getDetailData(this.iid)
         .then(res => {
           const data = res.result;
           this.swiperImgList = data.itemInfo.topImages;
@@ -186,24 +201,42 @@ export default {
       }
     },
 
+    //
+    shopDetail() {
+      //todo 打开店铺详情
+      this.$toast.show('打开店铺详情')
+    },
+    serviceClick() {
+      //todo 客服
+      this.$toast.show('打开客服页面')
+    },
+    collectClick() {
+      //todo 客服
+      this.$toast.show('收藏商品')
+    },
+
     //添加到购物车
     addCartClick() {
-      console.log('click-addcart')
       //购物车商品信息
       const goodObj = {
-        id: this.id,
+        iid: this.iid,
         desc: this.goodDetail.desc,
-        price: this.baseInfo.newPrice,
+        price: this.baseInfo.realPrice,
         title: this.baseInfo.title,
         img: this.swiperImgList[0]
       }
       this.$store.dispatch("addGoodToCart", goodObj)
         .then(result => {
-          //todo : show toast
-          console.log(result);
+          console.log(this.$toast)
+          this.$toast.show(result);
         }).catch(err => {
           console.log(err)
         })
+    },
+
+    //结算商品
+    goodCheckOut() {
+      this.$toast.show("商品结算")
     }
   }
 }

@@ -1,22 +1,22 @@
 <template>
-  <div id="detail-bottom-bar">
+  <div class="detail-bottom-bar">
     <div class="bottom-left">
-      <div class="service">
+      <div class="service" @click="serviceClick">
         <i class="icon"></i>
         <span>客服</span>
       </div>
       <div class="shop">
-        <i class="icon"></i>
+        <i class="icon" @click="shopClick"></i>
         <span>店铺</span>
       </div>
-      <div class="collect">
+      <div class="collect" @click="collectClick">
         <i class="icon"></i>
         <span>收藏</span>
       </div>
     </div>
     <div class="bottom-right">
       <div class="cart" @click="addCartClick">加入购物车</div>
-      <div class="buy">购买</div>
+      <div class="buy" @click="checkOutClick">购买</div>
     </div>
     <!-- <sport-ball ref="fall" class="sport-ball"></sport-ball> -->
   </div>
@@ -33,6 +33,18 @@ export default {
   methods: {
     addCartClick() {
       this.$emit('addCartClick')
+    },
+    checkOutClick() {
+      this.$emit('checkOutClick')
+    },
+    serviceClick() {
+      this.$emit('serviceClick')
+    },
+    shopClick() {
+      this.$emit('shopClick')
+    },
+    collectClick() {
+      this.$emit('collectClick')
     }
   },
 
@@ -42,7 +54,7 @@ export default {
 </script>
  
 <style scoped>
-#detail-bottom-bar {
+.detail-bottom-bar {
   height: 58px;
   background-color: #fff;
   display: flex;
@@ -51,6 +63,7 @@ export default {
 
   /* 底部固定做法1 */
   position: relative;
+  z-index: 10;
 
   /* 底部固定做法2 */
   /* position: fixed;

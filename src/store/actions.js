@@ -5,9 +5,7 @@ export const actions = {
     return new Promise((resolve, reject) => {
       let goodItem;
       if (context.state.cartList.length > 0) {
-        goodItem = context.state.cartList.find(
-          good => good.item.id == goodInfo.id
-        );
+        goodItem = context.state.cartList.find(good => good.iid == goodInfo.iid);
       }
       if (goodItem !== undefined) {
         //增加对应商品的数量
@@ -15,7 +13,7 @@ export const actions = {
         resolve("商品数量增加成功");
       } else {
         goodItem = {
-          item: goodInfo,
+          ...goodInfo,
           count: 1,
           checked: true //是否选中
         };

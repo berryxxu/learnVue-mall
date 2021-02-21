@@ -28,7 +28,7 @@ export default {
       this.$router.push({
         path: '/detail',
         query: {
-          id: this.goodsItem.iid
+          iid: this.goodsItem.iid
         }
       })
     }
