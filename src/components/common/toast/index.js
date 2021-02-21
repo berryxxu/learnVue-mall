@@ -10,8 +10,9 @@ const toastPlugin = {
     const toastConstructor = Vue.extend(Toast);
 
     //2.根据组件构造器，创建组件对象
-    //3.将组件对象挂载到一个div元素上
-    const toast = new toastConstructor().$mount(document.createElement("div"));
+    //3.将组件对象挂载到一个div元素上--实践发现$mount里无需传递参数
+    // const toast = new toastConstructor().$mount(document.createElement("div"));
+    const toast = new toastConstructor().$mount();
 
     //4.将DOM元素添加到文档
     document.body.appendChild(toast.$el);

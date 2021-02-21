@@ -1,7 +1,7 @@
 <template>
   <div class="shop-info">
     <div class="shop-info-top">
-      <img :src="shopInfo.logo" />
+      <img v-lazy="shopInfo.logo" />
       <span class="shop-name">{{ shopInfo.name }}</span>
     </div>
     <div class="shop-info-middle">

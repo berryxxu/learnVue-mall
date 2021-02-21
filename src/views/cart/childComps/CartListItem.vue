@@ -6,7 +6,7 @@
       @click.native="checkBtnClick"
     ></cart-check-botton>
     <div class="item-image">
-      <img :src="item.img" alt="" />
+      <img v-lazy="item.img" alt="" />
     </div>
     <div class="item-info">
       <div class="item-title">{{ item.title }}</div>

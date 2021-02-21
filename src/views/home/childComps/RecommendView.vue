@@ -3,8 +3,8 @@
   <div class="recommend">
     <div class="recommend-item" v-for="item in recommends" :key="item.index">
       <a :href="item.link">
-        <img :src="item.image" alt="">
-        <div>{{item.title}}</div>
+        <img v-lazy="item.image" alt="" />
+        <div>{{ item.title }}</div>
       </a>
     </div>
   </div>
@@ -12,12 +12,12 @@
 
 <script>
 export default {
-  name:"RecommendView",
-  props:{
-    recommends:{
+  name: "RecommendView",
+  props: {
+    recommends: {
       type: Array,
       required: true,
-      default(){
+      default() {
         return []
       }
     }
@@ -26,23 +26,22 @@ export default {
 </script>
 
 <style scoped>
-.recommend{
-  display:flex;
-  width:100%;
-  text-align:center;
-  font-size:12px;
+.recommend {
+  display: flex;
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
   padding: 10px 0 20px 0;
-  border-bottom : 10px solid #eee;
+  border-bottom: 10px solid #eee;
 }
 
-.recommend-item{
-  flex:1;
+.recommend-item {
+  flex: 1;
 }
 
-.recommend-item img{
-  width:70px;
-  height:70px;
-  margin-bottom:10px;
+.recommend-item img {
+  width: 70px;
+  height: 70px;
+  margin-bottom: 10px;
 }
-
 </style>
